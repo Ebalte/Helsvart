@@ -96,8 +96,8 @@
     </style>
 </head>
 <body>
-    <h1>Ваши баллы: <span id="score">0</span></h1>
-    <h2>Баллы за каждое нажатие: <span id="pointsPerClick">1</span></h2>
+    <h1>тапок: <span id="score">0</span></h1>
+    <h2>тапок за каждое нажатие: <span id="pointsPerClick">1</span></h2>
     <h2>Пассивный доход: <span id="passiveIncome">0.0</span> в секунду</h2> 
     <button id="scoreButton"></button>
 
@@ -136,7 +136,6 @@
             { type: 4, count: 0, baseCost: 450, increment: 1, maxUses: 15 },
             { type: 5, count: 0, baseCost: 5000, increment: 100, maxUses: 15 },
             { type: 6, count: 0, baseCost: 4500, increment: 10, maxUses: 15 },
-            // Новые улучшения
             { type: 7, count: 0, baseCost: 200, increment: 5, maxUses: 10 },
             { type: 8, count: 0, baseCost: 1000, increment: 50, maxUses: 10 },
             { type: 9, count: 0, baseCost: 2000, increment: 1, maxUses: 10 }
@@ -178,10 +177,10 @@
 
             upgrades.forEach(upgrade => {
                 if (upgrade.count < upgrade.maxUses) {
-                    const cost = upgrade.baseCost * Math.pow(2, upgrade.count); // Увеличение стоимости
+                    const cost = upgrade.baseCost * Math.pow(2, upgrade.count);
                     const button = document.createElement('button');
                     button.className = 'small-button';
-                    button.innerText = Улучшение ${upgrade.type}: ${upgrade.increment} за ${cost} (Использовано ${upgrade.count}/${upgrade.maxUses});
+                    button.innerText = `Улучшение ${upgrade.type}: ${upgrade.increment} за ${cost} (Использовано ${upgrade.count}/${upgrade.maxUses})`;
                     button.onclick = () => buyUpgrade(upgrade, cost);
                     container.appendChild(button);
                 }
@@ -195,19 +194,7 @@
                     pointsPerClick *= upgrade.increment;
                 } else if (upgrade.type === 2) {
                     passiveIncome += upgrade.increment;
-                } else if (upgrade.type === 3) {
-                    pointsPerClick *= upgrade.increment;
-                } else if (upgrade.type === 4) {
-                    passiveIncome += upgrade.increment;
-                } else if (upgrade.type === 5) {
-                    pointsPerClick *= upgrade.increment;
-                } else if (upgrade.type === 6) {
-                    passiveIncome += upgrade.increment;
-                } else if (upgrade.type === 7) {
-                    pointsPerClick += upgrade.increment;
-                } else if (upgrade.type === 8) {
-                    pointsPerClick += upgrade.increment;
-                } else if (upgrade.type === 9) {
+                } else {
                     passiveIncome += upgrade.increment;
                 }
                 upgrade.count += 1;
@@ -215,8 +202,9 @@
                 document.getElementById("pointsPerClick").innerText = pointsPerClick;
                 document.getElementById("passiveIncome").innerText = passiveIncome.toFixed(1);
                 localStorage.setItem("score", score);
+                localStorage.setItem('upgrades', JSON.stringify(upgrades));
                 document.getElementById('modalMessage').innerText = 'Улучшение куплено!';
-                renderAdditionalUpgrades(); // Перерисовываем улучшения
+                renderAdditionalUpgrades();
             } else {
                 document.getElementById('modalMessage').innerText = 'Недостаточно баллов для покупки!';
             }
