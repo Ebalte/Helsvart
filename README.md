@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Счетчик Балов</title>
+    <title>Счетчик Баллов</title>
     <style>
         body {
             display: flex;
@@ -56,18 +56,43 @@
             top: 50%;
             transform: translate(-50%, -50%);
             width: 80%;
-            max-width: 400px;
+            max-width: 500px;
             background-color: rgba(255, 255, 255, 0.9);
             border-radius: 10px;
             box-shadow: 0px 0px 10px rgba(0,0,0,0.5);
+            overflow: hidden;
         }
         .modal-content {
             padding: 20px;
-            border: 1px solid #888;
             color: black;
             display: flex;
             flex-direction: column;
             align-items: center;
+        }
+        .modal-title {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+        .modal-body {
+            overflow-y: auto;
+            max-height: 60vh; /* Высота модального окна с ползунком */
+            width: 100%;
+        }
+        .modal-body::-webkit-scrollbar {
+            width: 12px;
+        }
+        .modal-body::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .modal-body::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        .modal-body::-webkit-scrollbar-thumb:hover {
+            background: #555;
         }
         .close {
             color: #aaa;
@@ -84,17 +109,26 @@
         h1, h2 {
             margin: 5px;
         }
-        .modal-title {
+        .upgrade-item, .achievement-item {
+            margin: 5px;
+            font-size: 16px;
+            color: #000;
             display: flex;
             align-items: center;
-            margin-top: 10px;
-            margin-bottom: 10px;
-            width: 100%;
+            padding: 10px;
+            border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 0px 0px 5px rgba(0,0,0,0.3);
+            cursor: pointer;
         }
-        .upgrade-info, .settings-info {
-            margin-top: 10px;
-            font-size: 16px;
-            color: #333;
+        .upgrade-item:hover, .achievement-item:hover {
+            background-color: #f1f1f1;
+        }
+        .upgrade-item img, .achievement-item img {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+            border-radius: 50%;
         }
         .settings-container {
             display: flex;
@@ -134,7 +168,7 @@
             <div class="modal-title">
                 <h2>Улучшения</h2>
             </div>
-            <div id="additionalUpgrades"></div>
+            <div class="modal-body" id="additionalUpgrades"></div>
             <p id="modalMessage"></p>
         </div>
     </div>
@@ -143,6 +177,7 @@
         <div class="modal-content">
             <span class="close" onclick="closeModal('achievementModal')">&times;</span>
             <h2>Достижения</h2>
+            <div class="modal-body" id="achievementsList"></div>
             <p id="achievementMessage"></p>
         </div>
     </div>
@@ -160,6 +195,8 @@
                 </label>
                 <input type="text" id="promoCodeInput" placeholder="Введите промокод">
                 <button class="small-button" onclick="applyPromoCode()">Применить промокод</button>
+                <button class="small-button" onclick="openTelegramBot()">Открыть Telegram Бот</button>
+                <button class="small-button" onclick="resetProgress()">Сбросить прогресс</button>
             </div>
         </div>
     </div>
@@ -178,91 +215,75 @@
         let soundEnabled = true;
 
         let upgrades = [
-            { type: 1, count: 0, baseCost: 10, increment: 2, maxUses: 15 },
-            { type: 2, count: 0, baseCost: 50, increment: 0.1, maxUses: 15 },
-            { type: 3, count: 0, baseCost: 500, increment: 10, maxUses: 15 },
-            { type: 4, count: 0, baseCost: 450, increment: 1, maxUses: 15 },
-            { type: 5, count: 0, baseCost: 5000, increment: 100, maxUses: 15 },
-            { type: 6, count: 0, baseCost: 4500, increment: 10, maxUses: 15 },
-            { type: 7, count: 0, baseCost: 200, increment: 5, maxUses: 10 },
-            { type: 8, count: 0, baseCost: 1000, increment: 50, maxUses: 10 },
-            { type: 9, count: 0, baseCost: 2000, increment: 1, maxUses: 10 }
+            { type: 1, count: 0, baseCost: 10, increment: 2, maxUses: 15, image: 'path/to/upgrade1.png' },
+            { type: 2, count: 0, baseCost: 50, increment: 0.1, maxUses: 15, image: 'path/to/upgrade2.png' },
+            { type: 3, count: 0, baseCost: 500, increment: 10, maxUses: 15, image: 'path/to/upgrade3.png' },
+            { type: 4, count: 0, baseCost: 450, increment: 1, maxUses: 15, image: 'path/to/upgrade4.png' },
+            { type: 5, count: 0, baseCost: 5000, increment: 100, maxUses: 15, image: 'path/to/upgrade5.png' },
+            { type: 6, count: 0, baseCost: 5000, increment: 1, maxUses: 15, image: 'path/to/upgrade6.png' },
+            { type: 7, count: 0, baseCost: 50000, increment: 1000, maxUses: 15, image: 'path/to/upgrade7.png' },
+            { type: 8, count: 0, baseCost: 100000, increment: 1000, maxUses: 15, image: 'path/to/upgrade8.png' },
+            { type: 9, count: 0, baseCost: 2000000, increment: 2000, maxUses: 15, image: 'path/to/upgrade9.png' },
+        ];
+
+        let achievements = [
+            { threshold: 100, achieved: false, reward: 0.33 },
+            { threshold: 1000, achieved: false, reward: 0.33 },
+            { threshold: 10000, achieved: false, reward: 0.33 },
+            { threshold: 100000, achieved: false, reward: 0.33 },
+            { threshold: 1000000, achieved: false, reward: 0.33 },
+            { threshold: 10000000, achieved: false, reward: 0.33 },
+            { threshold: 100000000, achieved: false, reward: 0.33 },
+            { threshold: 1000000000, achieved: false, reward: 0.33 },
+        ];
+
+        let achievementsByUpgrades = [
+            { threshold: 1, achieved: false, reward: 0.33 },
+            { threshold: 10, achieved: false, reward: 0.33 },
+            { threshold: 100, achieved: false, reward: 0.33 },
+            { threshold: 1000, achieved: false, reward: 0.33 },
+            { threshold: 10000, achieved: false, reward: 0.33 },
+            { threshold: 100000, achieved: false, reward: 0.33 },
+            { threshold: 1000000, achieved: false, reward: 0.33 },
+            { threshold: 10000000, achieved: false, reward: 0.33 },
         ];
 
         document.getElementById("score").innerText = score.toFixed(1);
         document.getElementById("pointsPerClick").innerText = pointsPerClick;
         document.getElementById("passiveIncome").innerText = passiveIncome.toFixed(1);
 
-        function toggleMusic() {
-            const music = document.getElementById('backgroundMusic');
-            musicEnabled = document.getElementById('musicToggle').checked;
-            if (musicEnabled) {
-                music.play().catch(error => {
-                    console.log("Автоматическое воспроизведение заблокировано:", error);
-                });
-            } else {
-                music.pause();
-            }
-        }
-
-        function toggleSound() {
-            soundEnabled = document.getElementById('soundToggle').checked;
-        }
-
-        function applyPromoCode() {
-            const promoCode = document.getElementById('promoCodeInput').value;
-            if (promoCode === "PROMO2024") {
-                score += 100; // Например, добавить 100 баллов
-                document.getElementById("score").innerText = score.toFixed(1);
-                localStorage.setItem("score", score);
-                document.getElementById('modalMessage').innerText = 'Промокод принят! Вы получили 100 баллов.';
-            } else {
-                document.getElementById('modalMessage').innerText = 'Неверный промокод.';
-            }
-            document.getElementById('promoCodeInput').value = ''; // Очистить поле ввода
-        }
-
-        window.onload = function() {
-            if (musicEnabled) {
-                const music = document.getElementById('backgroundMusic');
-                music.play().catch(error => {
-                    console.log("Автоматическое воспроизведение заблокировано:", error);
-                });
-            }
-            document.getElementById('musicToggle').checked = musicEnabled;
-            document.getElementById('soundToggle').checked = soundEnabled;
-            document.getElementById('musicToggle').addEventListener('change', toggleMusic);
-            document.getElementById('soundToggle').addEventListener('change', toggleSound);
+        // Обработчик нажатия на главную кнопку
+        document.getElementById('scoreButton').onclick = function() {
+            addPoints();
         };
 
-        setInterval(() => {
-            score += passiveIncome;
-            document.getElementById("score").innerText = score.toFixed(1);
-            localStorage.setItem("score", score);
-        }, 1000);
-
-        document.getElementById("scoreButton").onclick = function() {
+        function addPoints() {
             score += pointsPerClick;
             document.getElementById("score").innerText = score.toFixed(1);
             localStorage.setItem("score", score);
-        };
+            checkAchievements(); // Проверяем достижения после добавления очков
+        }
+
+        function openModal(id) {
+            document.getElementById(id).style.display = "block";
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = "none";
+        }
 
         function openUpgradeModal() {
-            document.getElementById('upgradeModal').style.display = "block";
+            openModal('upgradeModal');
             renderAdditionalUpgrades();
         }
 
         function openAchievementModal() {
-            document.getElementById('achievementModal').style.display = "block";
+            openModal('achievementModal');
+            renderAchievements();
         }
 
         function openSettingsModal() {
-            document.getElementById('settingsModal').style.display = "block";
-        }
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = "none";
-            document.getElementById('modalMessage').innerText = '';
+            openModal('settingsModal');
         }
 
         function renderAdditionalUpgrades() {
@@ -270,64 +291,181 @@
             container.innerHTML = '';
 
             upgrades.forEach(upgrade => {
-                if (upgrade.count < upgrade.maxUses) {
-                    const cost = upgrade.baseCost * Math.pow(2, upgrade.count); // Увеличение стоимости
-                    const button = document.createElement('button');
-                    button.className = 'small-button';
-                    button.innerText = `Улучшение ${upgrade.type}: ${upgrade.increment} за ${cost} (Использовано ${upgrade.count}/${upgrade.maxUses})`;
-                    button.onclick = () => buyUpgrade(upgrade, cost);
-                    container.appendChild(button);
+                const upgradeItem = document.createElement('div');
+                upgradeItem.className = 'upgrade-item';
+                const img = document.createElement('img');
+                img.src = upgrade.image;
+                const text = document.createElement('span');
+                text.innerText = `Улучшение ${upgrade.type} - Стоимость: ${upgrade.baseCost} баллов, Количество: ${upgrade.count}`;
+                upgradeItem.appendChild(img);
+                upgradeItem.appendChild(text);
+                const upgradeButton = document.createElement('button');
+                upgradeButton.className = 'small-button';
+                upgradeButton.innerText = 'Купить';
+                upgradeButton.onclick = () => buyUpgrade(upgrade, upgrade.baseCost);
+                container.appendChild(upgradeItem);
+                container.appendChild(upgradeButton);
+            });
+        }
+
+        function renderAchievements() {
+            const container = document.getElementById('achievementsList');
+            container.innerHTML = '';
+
+            achievements.forEach(achievement => {
+                const listItem = document.createElement('div');
+                listItem.className = 'achievement-item';
+                const img = document.createElement('img');
+                img.src = 'path/to/achievement_icon.png'; // Замените на подходящую иконку
+                const text = document.createElement('span');
+                text.innerText = `Достижение за ${achievement.threshold} баллов - ${achievement.achieved ? 'Достигнуто' : 'Не достигнуто'}`;
+                listItem.appendChild(img);
+                listItem.appendChild(text);
+                container.appendChild(listItem);
+            });
+
+            achievementsByUpgrades.forEach(achievement => {
+                const listItem = document.createElement('div');
+                listItem.className = 'achievement-item';
+                const img = document.createElement('img');
+                img.src = 'path/to/upgrade_icon.png'; // Замените на подходящую иконку
+                const text = document.createElement('span');
+                text.innerText = `Достижение за покупку ${achievement.threshold} улучшений - ${achievement.achieved ? 'Достигнуто' : 'Не достигнуто'}`;
+                listItem.appendChild(img);
+                listItem.appendChild(text);
+                container.appendChild(listItem);
+            });
+        }
+
+        function achievementsAchieved(achievement, type) {
+            if (type === 'points') {
+                score += score * achievement.reward;
+                document.getElementById("score").innerText = score.toFixed(1);
+                localStorage.setItem("score", score);
+            } else if (type === 'upgrades') {
+                score += score * achievement.reward;
+                document.getElementById("score").innerText = score.toFixed(1);
+                localStorage.setItem("score", score);
+            }
+
+            achievement.achieved = true;
+            document.getElementById('achievementMessage').innerText = `Достижение выполнено: ${achievement.threshold} баллов! Вы получили ${Math.round(score * achievement.reward)} дополнительных баллов.`;
+
+            renderAchievements();
+        }
+
+        function checkAchievements() {
+            achievements.forEach(achievement => {
+                if (!achievement.achieved && score >= achievement.threshold) {
+                    achievementsAchieved(achievement, 'points');
                 }
             });
         }
 
-        function buyUpgrade(upgrade, cost) {
-            if (score >= cost) {
-                score -= cost;
-                if (upgrade.type === 1) {
-                    pointsPerClick *= upgrade.increment;
-                } else if (upgrade.type === 2) {
-                    passiveIncome += upgrade.increment;
-                } else if (upgrade.type === 3) {
-                    pointsPerClick *= upgrade.increment;
-                } else if (upgrade.type === 4) {
-                    passiveIncome += upgrade.increment;
-                } else if (upgrade.type === 5) {
-                    pointsPerClick *= upgrade.increment;
-                } else if (upgrade.type === 6) {
-                    passiveIncome += upgrade.increment;
-                } else if (upgrade.type === 7) {
-                    pointsPerClick += upgrade.increment;
-                } else if (upgrade.type === 8) {
-                    pointsPerClick += upgrade.increment;
-                } else if (upgrade.type === 9) {
-                    passiveIncome += upgrade.increment;
+        function checkUpgradeAchievements() {
+            achievementsByUpgrades.forEach(achievement => {
+                if (!achievement.achieved && upgrades.some(u => u.count >= achievement.threshold)) {
+                    achievementsAchieved(achievement, 'upgrades');
                 }
-                upgrade.count += 1;
+            });
+        }
+
+     function buyUpgrade(upgrade, cost) {
+    if (score >= cost) {
+        score -= cost;
+        if (upgrade.type === 1 || upgrade.type === 3 || upgrade.type === 5 || upgrade.type === 7 || upgrade.type === 8) {
+            pointsPerClick += upgrade.increment;
+        } else if (upgrade.type === 2 || upgrade.type === 4 || upgrade.type === 6 || upgrade.type === 9) {
+            passiveIncome += upgrade.increment;
+        }
+        upgrade.count += 1;
+
+        // Умножаем стоимость следующего улучшения на 5
+        upgrade.baseCost *= 5;
+
+        document.getElementById("score").innerText = score.toFixed(1);
+        document.getElementById("pointsPerClick").innerText = pointsPerClick;
+        document.getElementById("passiveIncome").innerText = passiveIncome.toFixed(1);
+        localStorage.setItem("score", score);
+
+        // Сохраняем улучшения в localStorage
+        localStorage.setItem("upgrades", JSON.stringify(upgrades));
+
+        document.getElementById('modalMessage').innerText = 'Улучшение куплено!';
+
+        checkUpgradeAchievements();
+        renderAdditionalUpgrades();
+        renderAchievements(); // Обновляем список достижений
+    } else {
+        document.getElementById('modalMessage').innerText = 'Недостаточно баллов для покупки!';
+    }
+}
+
+
+
+        function toggleMusic() {
+            musicEnabled = !musicEnabled;
+            const music = document.getElementById('backgroundMusic');
+            if (musicEnabled) {
+                music.play().catch(error => {
+                    console.log("Автоматическое воспроизведение заблокировано:", error);
+                });
+            } else {
+                music.pause();
+            }
+            localStorage.setItem('musicEnabled', musicEnabled);
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            localStorage.setItem('soundEnabled', soundEnabled);
+        }
+
+        function applyPromoCode() {
+            const promoCode = document.getElementById('promoCodeInput').value;
+            alert('Промокод применен!');
+            // Здесь можно добавить логику проверки и применения промокода
+        }
+
+        function openTelegramBot() {
+            window.open('https://t.me/your_telegram_bot', '_blank');
+        }
+
+        function resetProgress() {
+            if (confirm("Вы уверены, что хотите сбросить прогресс?")) {
+                localStorage.removeItem("score");
+                score = 0;
+                pointsPerClick = 1;
+                passiveIncome = 0;
+                upgrades.forEach(upgrade => {
+                    upgrade.count = 0;
+                });
                 document.getElementById("score").innerText = score.toFixed(1);
                 document.getElementById("pointsPerClick").innerText = pointsPerClick;
                 document.getElementById("passiveIncome").innerText = passiveIncome.toFixed(1);
-                localStorage.setItem("score", score);
-                document.getElementById('modalMessage').innerText = 'Улучшение куплено!';
-                renderAdditionalUpgrades(); // Перерисовываем улучшения
-            } else {
-                document.getElementById('modalMessage').innerText = 'Недостаточно баллов для покупки!';
+                renderAdditionalUpgrades();
+                renderAchievements();
             }
         }
-
-        window.onclick = function(event) {
-            if (event.target == document.getElementById('upgradeModal') || event.target == document.getElementById('achievementModal') || event.target == document.getElementById('settingsModal')) {
-                closeModal(event.target.id);
-            }
-        };
-    </script>
-<button class="small-button" onclick="openTelegramBot()">Открыть Telegram Бот</button>
-
-<script>
-    function openTelegramBot() {
-        window.open("https://t.me/Target_connect_bot", "_blank");
+      window.onload = function() {
+    if (musicEnabled) {
+        const music = document.getElementById('backgroundMusic');
+        music.play().catch(error => {
+            console.log("Автоматическое воспроизведение заблокировано:", error);
+        });
     }
-</script>
+    renderAdditionalUpgrades();
+    renderAchievements();
 
+    // Восстанавливаем состояние улучшений из localStorage
+    const savedUpgrades = localStorage.getItem("upgrades");
+    if (savedUpgrades) {
+        upgrades = JSON.parse(savedUpgrades);
+    }
+
+    // Обновляем отображение улучшений
+    renderAdditionalUpgrades();
+};
+    </script>
 </body>
 </html>
