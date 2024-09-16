@@ -15,10 +15,12 @@
             background-color: #000;
             color: #fff;
             margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
         #scoreButton {
-            width: 350px;
-            height: 350px;
+            width: 80vmin;
+            height: 80vmin;
             border-radius: 50%;
             background-color: #fff;
             background-image: url('https://sun9-53.userapi.com/impg/-XApqPO8d5D0l-y3_KvP39yPyi68JPLcU8i80Q/gW-b2OjEJOA.jpg?size=1280x1280&quality=95&sign=e54e4442564b152dbb30fbdfab36d3e1&type=album');
@@ -33,30 +35,31 @@
             justify-content: center;
             width: 100%;
             margin-top: 10px;
+            flex-wrap: wrap;
         }
         .small-button {
-            height: 75px; 
-            width: 300px;
+            height: 60px; 
+            width: 200px;
             border-radius: 30px;
             background-color: #000;
             color: #fff;
             border: 2px solid #fff;
             cursor: pointer;
-            margin: 5px 0;
-            font-size: 20px;
+            margin: 5px;
+            font-size: 16px;
         }
         .modal {
             display: none;
             position: fixed;
             z-index: 1;
             left: 50%;
-            top: calc(50% - 175px - 30%);
-            transform: translateX(-50%);
-            width: 350px;
-            height: auto;
-            overflow: auto;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            max-width: 400px;
             background-color: rgba(255, 255, 255, 0.9);
             border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.5);
         }
         .modal-content {
             padding: 20px;
@@ -88,10 +91,28 @@
             margin-bottom: 10px;
             width: 100%;
         }
-        .upgrade-info {
+        .upgrade-info, .settings-info {
             margin-top: 10px;
             font-size: 16px;
             color: #333;
+        }
+        .settings-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+        .settings-container label {
+            margin: 5px;
+            font-size: 16px;
+        }
+        .settings-container input[type="text"] {
+            width: 100%;
+            max-width: 250px;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
         }
     </style>
 </head>
@@ -103,7 +124,8 @@
 
     <div class="button-container">
         <button class="small-button" onclick="openUpgradeModal()">Улучшения</button>
-        <button class="small-button" onclick="openAchievementModal()">Достижения</button> 
+        <button class="small-button" onclick="openAchievementModal()">Достижения</button>
+        <button class="small-button" onclick="openSettingsModal()">Настройки</button>
     </div>
 
     <div id="upgradeModal" class="modal">
@@ -125,10 +147,36 @@
         </div>
     </div>
 
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('settingsModal')">&times;</span>
+            <h2>Настройки</h2>
+            <div class="settings-container">
+                <label>
+                    <input type="checkbox" id="musicToggle"> Включить музыку
+                </label>
+                <label>
+                    <input type="checkbox" id="soundToggle"> Включить звук
+                </label>
+                <input type="text" id="promoCodeInput" placeholder="Введите промокод">
+                <button class="small-button" onclick="applyPromoCode()">Применить промокод</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Добавляем тег <audio> для музыки -->
+    <audio id="backgroundMusic" loop>
+        <source src="file:///C:/Users/ebalte/Downloads/kk/my_music.mp3" type="audio/mpeg">
+        Ваш браузер не поддерживает аудио.
+    </audio>
+
     <script>
         let pointsPerClick = 1;
         let score = localStorage.getItem("score") ? parseFloat(localStorage.getItem("score")) : 0;
         let passiveIncome = 0;
+        let musicEnabled = true;
+        let soundEnabled = true;
+
         let upgrades = [
             { type: 1, count: 0, baseCost: 10, increment: 2, maxUses: 15 },
             { type: 2, count: 0, baseCost: 50, increment: 0.1, maxUses: 15 },
@@ -144,6 +192,48 @@
         document.getElementById("score").innerText = score.toFixed(1);
         document.getElementById("pointsPerClick").innerText = pointsPerClick;
         document.getElementById("passiveIncome").innerText = passiveIncome.toFixed(1);
+
+        function toggleMusic() {
+            const music = document.getElementById('backgroundMusic');
+            musicEnabled = document.getElementById('musicToggle').checked;
+            if (musicEnabled) {
+                music.play().catch(error => {
+                    console.log("Автоматическое воспроизведение заблокировано:", error);
+                });
+            } else {
+                music.pause();
+            }
+        }
+
+        function toggleSound() {
+            soundEnabled = document.getElementById('soundToggle').checked;
+        }
+
+        function applyPromoCode() {
+            const promoCode = document.getElementById('promoCodeInput').value;
+            if (promoCode === "PROMO2024") {
+                score += 100; // Например, добавить 100 баллов
+                document.getElementById("score").innerText = score.toFixed(1);
+                localStorage.setItem("score", score);
+                document.getElementById('modalMessage').innerText = 'Промокод принят! Вы получили 100 баллов.';
+            } else {
+                document.getElementById('modalMessage').innerText = 'Неверный промокод.';
+            }
+            document.getElementById('promoCodeInput').value = ''; // Очистить поле ввода
+        }
+
+        window.onload = function() {
+            if (musicEnabled) {
+                const music = document.getElementById('backgroundMusic');
+                music.play().catch(error => {
+                    console.log("Автоматическое воспроизведение заблокировано:", error);
+                });
+            }
+            document.getElementById('musicToggle').checked = musicEnabled;
+            document.getElementById('soundToggle').checked = soundEnabled;
+            document.getElementById('musicToggle').addEventListener('change', toggleMusic);
+            document.getElementById('soundToggle').addEventListener('change', toggleSound);
+        };
 
         setInterval(() => {
             score += passiveIncome;
@@ -166,6 +256,10 @@
             document.getElementById('achievementModal').style.display = "block";
         }
 
+        function openSettingsModal() {
+            document.getElementById('settingsModal').style.display = "block";
+        }
+
         function closeModal(modalId) {
             document.getElementById(modalId).style.display = "none";
             document.getElementById('modalMessage').innerText = '';
@@ -177,7 +271,7 @@
 
             upgrades.forEach(upgrade => {
                 if (upgrade.count < upgrade.maxUses) {
-                    const cost = upgrade.baseCost * Math.pow(2, upgrade.count);
+                    const cost = upgrade.baseCost * Math.pow(2, upgrade.count); // Увеличение стоимости
                     const button = document.createElement('button');
                     button.className = 'small-button';
                     button.innerText = `Улучшение ${upgrade.type}: ${upgrade.increment} за ${cost} (Использовано ${upgrade.count}/${upgrade.maxUses})`;
@@ -194,7 +288,19 @@
                     pointsPerClick *= upgrade.increment;
                 } else if (upgrade.type === 2) {
                     passiveIncome += upgrade.increment;
-                } else {
+                } else if (upgrade.type === 3) {
+                    pointsPerClick *= upgrade.increment;
+                } else if (upgrade.type === 4) {
+                    passiveIncome += upgrade.increment;
+                } else if (upgrade.type === 5) {
+                    pointsPerClick *= upgrade.increment;
+                } else if (upgrade.type === 6) {
+                    passiveIncome += upgrade.increment;
+                } else if (upgrade.type === 7) {
+                    pointsPerClick += upgrade.increment;
+                } else if (upgrade.type === 8) {
+                    pointsPerClick += upgrade.increment;
+                } else if (upgrade.type === 9) {
                     passiveIncome += upgrade.increment;
                 }
                 upgrade.count += 1;
@@ -202,20 +308,18 @@
                 document.getElementById("pointsPerClick").innerText = pointsPerClick;
                 document.getElementById("passiveIncome").innerText = passiveIncome.toFixed(1);
                 localStorage.setItem("score", score);
-                localStorage.setItem('upgrades', JSON.stringify(upgrades));
                 document.getElementById('modalMessage').innerText = 'Улучшение куплено!';
-                renderAdditionalUpgrades();
+                renderAdditionalUpgrades(); // Перерисовываем улучшения
             } else {
                 document.getElementById('modalMessage').innerText = 'Недостаточно баллов для покупки!';
             }
         }
 
         window.onclick = function(event) {
-            if (event.target == document.getElementById('upgradeModal') || event.target == document.getElementById('achievementModal')) {
+            if (event.target == document.getElementById('upgradeModal') || event.target == document.getElementById('achievementModal') || event.target == document.getElementById('settingsModal')) {
                 closeModal(event.target.id);
             }
         };
     </script>
 </body>
 </html>
-
