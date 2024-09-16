@@ -321,5 +321,13 @@
             }
         };
     </script>
+<button class="small-button" onclick="openTelegramBot()">Открыть Telegram Бот</button>
+
+<script>
+    function openTelegramBot() {
+        window.open("https://t.me/Target_connect_bot", "_blank");
+    }
+</script>
+
 </body>
 </html>
