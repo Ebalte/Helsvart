@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Helsvart</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            background-color: #f0f0f0; /* Цвет фона страницы */
+        }
+
+        .about-container {
+            width: 825px; /* Ширина равна ширине изображения */
+            margin: 20px 0; /* Отступы сверху и снизу */
+            border: 0px solid #FFFFFF; /* Рамка вокруг текста */
+            padding: 0px; /* Отступы внутри рамки */
+            text-align: left; /* Выровнять текст по левому краю */
+            font-size: 1.5em; /* Размер шрифта для остального текста */
+        }
+
+        .about-title {
+            font-size: 2em; /* Увеличенный размер шрифта для слова "About" */
+            font-weight: normal; /* Обычный шрифт */
+        }
+
+        .image-container {
+            max-width: 100%; /* Изображение занимает 100% ширины */
+            height: auto; /* Автоматическая высота */
+        }
+
+        .header {
+            display: flex; /* Flex для горизонтального расположения */
+            align-items: center; /* Вертикальное выравнивание */
+            background-color: #000000; /* Фон заголовка */
+            padding: 10px; /* Паддинг вокруг заголовка */
+        }
+
+        .header-image {
+            width: 140px; /* Фиксированная ширина изображения для ПК */
+            height: auto; /* Автоматическая высота */
+        }
+
+        .menu {
+            display: flex; /* Выровнять кнопки горизонтально */
+            margin-left: auto; /* Сдвинуть вправо */
+            color: #FFFFFF; /* Цвет текста кнопок */
+        }
+
+        .menu a {
+            padding: 10px 15px; /* Внутренние отступы для кнопок */
+            color: #FFFFFF; /* Цвет текста кнопок */
+            text-decoration: none; /* Убрать подчеркивание */
+        }
+
+        /* Стиль для мобильного меню */
+        .mobile-menu {
+            position: fixed; /* Фиксированное позиционирование */
+            top: 0; /* Зафиксировать меню вверху */
+            right: -250px; /* Скрываем меню за пределами экрана */
+            width: 250px; /* Ширина меню */
+            height: 100%; /* Высота меню */
+            background-color: #000000; /* Цвет фона меню */
+            transition: right 0.3s ease; /* Анимация выдвижения */
+            display: flex; /* Используем flex для вертикального выравнивания */
+            flex-direction: column; /* Вертикальное расположение элементов */
+            padding-top: 10px; /* Уменьшаем отступ сверху для поднятия содержимого */
+        }
+
+        .mobile-menu.active {
+            right: 0; /* Позиция при открытом меню */
+        }
+
+        .hamburger {
+            cursor: pointer;
+            display: none; /* Изначально скрыто */
+            flex-direction: column;
+            position: absolute; /* Позиция кнопки */
+            top: 20px; /* Отступ сверху */
+            right: 20px; /* Отступ справа */
+        }
+
+        .bar {
+            height: 3px;
+            width: 30px;
+            background-color: #FFFFFF;
+            margin: 2px 0; /* Отступ между полосками */
+        }
+
+        .close {
+            display: none; /* Изначально скрыт */
+            cursor: pointer;
+            margin: 10px; /* Уменьшаем отступы вокруг кнопки закрытия для поднятия ее вверх */
+            align-self: flex-end; /* Выравнивание вправо */
+            font-size: 24px; /* Размер шрифта крестика */
+            color: #FFFFFF; /* Цвет крестика */
+        }
+
+        /* Увеличение размера текста кнопок на мобильных устройствах */
+        @media (max-width: 768px) {
+            .header {
+                justify-content: center; /* Центровка содержимого для мобильных */
+                align-items: center; /* Центрируем содержимое */
+                padding: 3px; /* Уменьшаем отступы для мобильного устройства */
+            }
+
+            .header-image {
+                width: 150%; /* Уменьшаем ширину логотипа на 70% для мобильных устройств */
+                max-width: 268px; /* Устанавливаем максимальную ширину для логотипа на мобильных устройствах */
+                height: auto; /* Автоматическая высота */
+                margin: 0 auto; /* Центрируем логотип */
+            }
+
+            .hamburger {
+                display: flex; /* Показать кнопку гамбургера на мобильных устройствах */
+            }
+
+            .menu {
+                display: none; /* Скрыть кнопки меню на мобильных устройствах */
+            }
+
+            .close {
+                display: block; /* Показать крестик в мобильном меню */
+                margin: 10px; /* Уменьшаем отступы вокруг кнопки закрытия */
+            }
+
+            .mobile-menu a {
+                font-size: 3em; /* Увеличенный размер шрифта для кнопок на мобильных устройствах */
+                padding: 20px 15px; /* Подходящие отступы для увеличенного текста */
+                color: #FFFFFF; /* Белый цвет текста */
+                text-decoration: none; /* Убрать подчеркивание под ссылками */
+            }
+
+            .about-container {
+                width: 90%; /* Ширина контейнера изменяется на мобильных устройствах */
+                font-size: 1.2em; /* Меньший размер шрифта */
+            }
+
+            .about-title {
+                font-size: 1.5em; /* Меньший размер шрифта для заголовка */
+                font-weight: normal; /* Обычный шрифт */
+            }
+
+            .latest-release img {
+                width: 100%; /* Изображение занимает всю ширину на мобильных устройствах */
+                height: auto; /* Автоматическая высота */
+            }
+
+            h1, h2 {
+                font-size: 2em; /* Уменьшение размера шрифта для заголовков */
+                font-weight: normal; /* Обычный шрифт для заголовков */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="gg.png" alt="Image" class="header-image">
+
+        <div class="menu">
+            <a href="member.html">Member</a>
+            <a href="discography.html">Discography</a>
+            <a href="movie.html">Movie</a>
+            <a href="gallery.html">Gallery</a>
+            <a href="goods.html">Goods</a>
+            <a href="contact.html">Contact</a>
+        </div>
+
+        <div class="hamburger" id="hamburger" onclick="toggleMenu()">
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+        </div>
+
+        <div class="mobile-menu" id="menu">
+            <div class="close" id="close" onclick="toggleMenu()">✖</div>
+            <a href="member.html">Member</a>
+            <a href="discography.html">Discography</a>
+            <a href="movie.html">Movie</a>
+            <a href="gallery.html">Gallery</a>
+            <a href="goods.html">Goods</a>
+            <a href="contact.html">Contact</a>
+        </div>
+    </div>
+    <div class="content">
+        <div class="latest-release">
+            <h1 style="text-align: center; font-size: 3em; font-weight: normal;">Latest release</h1>
+            <div class="gray-background">
+                <img src="ff.jpg" alt="Latest release image" class="image-container" style="margin: 2px auto; border: 2px solid #FFFFFF;">
+            </div>
+            <div style="text-align: center; margin-top: 20px;">
+                <h2 style="font-size: 2em; font-weight: normal;">The Howl of a Snowstorm</h2>
+                <p style="font-size: 2em;">
+                    <a href="https://band.link/6Z7Th" style="color: #FFFFFF; margin-right: 10px; text-decoration: none;">Listen</a>
+                    <a href="https://t.me/helsvart/347" style="color: #FFFFFF; text-decoration: none;">Buy on CD</a>
+                </p>
+                <div class="about-container">
+                    <span class="about-title">About:</span><br>
+                    Helsvårt — российская блэк-метал-группа, основанная в 2023 году в городе Нижнем Новгороде, играющая в разных поджанрах и стилях. На данный момент группа в творческом перерыве на неопределённый срок и выпустила один дебютный релиз-сингл.<br><br>
+                    Helsvårt is a Russian black metal band founded in 2023 in the city of Nizhny Novgorod, playing in different subgenres and styles. The band is currently on a creative hiatus indefinitely and has released one debut release single.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleMenu() {
+            var menu = document.getElementById("menu");
+            menu.classList.toggle("active");
+        }
+    </script>
+</body>
+</html>

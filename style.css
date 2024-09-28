@@ -1,0 +1,93 @@
+@import url('https://fonts.cdnfonts.com/css/ancient');
+
+body {
+    margin: 0;
+    font-family: 'Ancient';
+    background-color: #000; /* Черный цвет фона */
+    color: #fff; /* Белый цвет текста */
+}
+
+.header {
+    background-color: rgb(51, 51, 51);
+    display: flex;
+    align-items: center;
+    height: 100px; /* Увеличенная высота полосы */
+    padding: 0 10px; /* Внутренние отступы */
+    box-sizing: border-box;
+    justify-content: space-between; /* Распределение элементов по горизонтали */
+}
+
+.image-container {
+    max-width: 200px; /* Размер изображения */
+    height: 100%; /* Изображение занимает всю высоту полосы */
+    margin-right: 10px; /* Отступ между изображением и меню */
+}
+
+.menu {
+    display: flex;
+    flex-wrap: nowrap; /* Кнопки не переносятся на новую строку */
+    justify-content: flex-end; /* Кнопки выравниваются по правому краю */
+}
+
+.menu a {
+    font-family: 'Ancient';
+    color: rgb(255, 255, 255);
+    text-decoration: none;
+    padding: 5px 10px;
+    border: 1px solid transparent;
+    transition: border 0.01s;
+    font-size: 45px; /* Увеличение размера шрифта для кнопок меню */
+}
+
+.menu a:hover {
+    border: 0px solid rgb(255, 255, 255);
+}
+
+.content {
+    background-color: #000; /* Черный цвет фона */
+    color: #fff; /* Белый цвет текста */
+    padding: 20px; /* Внутренние отступы */
+}
+
+.latest-release {
+    text-align: center;
+}
+
+.latest-release img {
+    width: 500px;
+    height: 500px;
+    margin: 2px auto;
+}
+
+/* Адаптивные стили */
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column; /* Вертикальное размещение заголовков на малых экранах */
+        height: auto; /* Автоматическая высота */
+    }
+
+    .image-container {
+        max-width: 100px; /* Уменьшить размер изображения на телефоне */
+    }
+
+    .menu {
+        justify-content: center; /* Центрировать меню */
+        flex-wrap: wrap; /* Позволить переносу кнопок на новую строку */
+    }
+
+    .menu a {
+        font-size: 30px; /* Уменьшить размер шрифта для кнопок меню */
+        margin: 5px; /* Отступ между кнопками */
+    }
+
+    .latest-release img {
+        width: 100%; /* Изображение занимает всю ширину экрана */
+        height: auto; /* Автоматическая высота */
+    }
+}
+
+@media (max-width: 480px) {
+    .menu a {
+        font-size: 24px; /* Дополнительное уменьшение размера шрифта для мобильных устройств */
+    }
+}

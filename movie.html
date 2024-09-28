@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ancient - [Page Title]</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://fonts.cdnfonts.com/css/ancient">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Ancient';
+            background-color: #000; /* Черный цвет фона */
+            color: #fff; /* Белый цвет текста */
+        }
+
+        .header {
+            display: flex; /* Flex для горизонтального расположения */
+            align-items: center; /* Вертикальное выравнивание */
+            background-color: #000000; /* Фон заголовка */
+            padding: 10px; /* Паддинг вокруг заголовка */
+        }
+
+        .image-container {
+            width: 140px; /* Фиксированная ширина логотипа для ПК */
+            height: auto; /* Автоматическая высота */
+        }
+
+        .menu {
+            display: flex; /* Выровнять кнопки горизонтально */
+            margin-left: auto; /* Сдвинуть вправо */
+            color: #FFFFFF; /* Цвет текста кнопок */
+        }
+
+        .menu a {
+            padding: 10px 15px; /* Внутренние отступы для кнопок */
+            color: #FFFFFF; /* Цвет текста кнопок */
+            text-decoration: none; /* Убрать подчеркивание */
+        }
+
+        /* Стиль для мобильного меню */
+        .mobile-menu {
+            position: fixed; /* Фиксированное позиционирование */
+            top: 0; /* Зафиксировать меню вверху */
+            right: -250px; /* Скрываем меню за пределами экрана */
+            width: 250px; /* Ширина меню */
+            height: 100%; /* Высота меню */
+            background-color: #000000; /* Цвет фона меню */
+            transition: right 0.1s ease; /* Анимация выдвижения */
+            display: flex; /* Используем flex для вертикального выравнивания */
+            flex-direction: column; /* Вертикальное расположение элементов */
+            padding-top: 10px; /* Уменьшаем отступ сверху для поднятия содержимого */
+        }
+
+        .mobile-menu.active {
+            right: 0; /* Позиция при открытом меню */
+        }
+
+        .hamburger {
+            cursor: pointer;
+            display: none; /* Изначально скрыто */
+            flex-direction: column;
+            position: absolute; /* Позиция кнопки */
+            top: 20px; /* Отступ сверху */
+            right: 20px; /* Отступ справа */
+        }
+
+        .bar {
+            height: 3px;
+            width: 30px;
+            background-color: #FFFFFF;
+            margin: 2px 0; /* Отступ между полосками */
+        }
+
+        .close {
+            display: none; /* Изначально скрыт */
+            cursor: pointer;
+            margin: 10px; /* Уменьшаем отступы вокруг кнопки закрытия для поднятия ее вверх */
+            align-self: flex-end; /* Выравнивание вправо */
+            font-size: 24px; /* Размер шрифта крестика */
+            color: #FFFFFF; /* Цвет крестика */
+        }
+
+        /* Адаптивные стили */
+        @media (max-width: 768px) {
+            .header {
+                justify-content: center; /* Центровка содержимого для мобильных */
+                align-items: center; /* Центрируем содержимое */
+                padding: 3px; /* Уменьшаем отступы для мобильного устройства */
+            }
+
+            .image-container {
+                width: 150%; /* Уменьшаем ширину логотипа для мобильной версии */
+                max-width: 268px; /* Устанавливаем максимальную ширину для логотипа на мобильных устройствах */
+            }
+
+            .hamburger {
+                display: flex; /* Показать кнопку гамбургера на мобильных устройствах */
+            }
+
+            .menu {
+                display: none; /* Скрыть кнопки меню на мобильных устройствах */
+            }
+
+            .close {
+                display: block; /* Показать крестик в мобильном меню */
+                margin: 10px; /* Уменьшаем отступы вокруг кнопки закрытия */
+            }
+
+            .mobile-menu a {
+                font-size: 3em; /* Увеличенный размер шрифта для кнопок на мобильных устройствах */
+                padding: 20px 15px; /* Подходящие отступы для увеличенного текста */
+                color: #FFFFFF; /* Белый цвет текста */
+                text-decoration: none; /* Убрать подчеркивание под ссылками */
+            }
+
+            .about-container {
+                width: 90%; /* Ширина контейнера изменяется на мобильных устройствах */
+                font-size: 1.2em; /* Меньший размер шрифта */
+            }
+
+            .about-title {
+                font-size: 1.5em; /* Меньший размер шрифта для заголовка */
+                font-weight: normal; /* Обычный шрифт */
+            }
+
+            h1, h2 {
+                font-size: 2em; /* Уменьшение размера шрифта для заголовков */
+                font-weight: normal; /* Обычный шрифт для заголовков */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="gg.png" alt="Image" class="image-container">
+
+        <div class="menu">
+            <a href="index.html">Home</a>
+            <a href="member.html">Member</a>
+            <a href="discography.html">Discography</a>
+            <a href="movie.html">Movie</a>
+            <a href="gallery.html">Gallery</a>
+            <a href="goods.html">Goods</a>
+            <a href="contact.html">Contact</a>
+        </div>
+
+        <div class="hamburger" id="hamburger" onclick="toggleMenu()">
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+        </div>
+
+        <div class="mobile-menu" id="menu">
+            <div class="close" id="close" onclick="toggleMenu()">✖</div>
+            <a href="index.html">Home</a>
+            <a href="member.html">Member</a>
+            <a href="discography.html">Discography</a>
+            <a href="movie.html">Movie</a>
+            <a href="gallery.html">Gallery</a>
+            <a href="goods.html">Goods</a>
+            <a href="contact.html">Contact</a>
+        </div>
+    </div>
+    <script>
+        function toggleMenu() {
+            var menu = document.getElementById("menu");
+            menu.classList.toggle("active");
+        }
+    </script>
+</body>
+</html>
+
